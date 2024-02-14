@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,9 @@ export class LoginComponent {
   loginform!: FormGroup;
 
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder,
+    private authService: AuthService
+  ) { }
 
   ngOnInit() {
     this.loginform = this.fb.group({
@@ -26,8 +29,11 @@ export class LoginComponent {
 
   login() {
     console.log(this.loginform?.value);
+    this.authService.login(this.loginform.value).subscribe((res) =>{
+      console.log(res);
+   
+    })
   }
-
 
 
 }

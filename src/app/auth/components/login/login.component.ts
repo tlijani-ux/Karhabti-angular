@@ -17,40 +17,38 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder,
     private authService: AuthService,
-    private message: NzMessageService
+    private message: NzMessageService,
+    private route: Router,
   ) { }
 
   ngOnInit() {
     this.loginform = this.fb.group({
-
       email: [null, [Validators.required, Validators.email]],
       password: [null, [Validators.required]]
     })
-
   }
 
   login() {
     console.log(this.loginform?.value);
-    this.authService.login(this.loginform.value).subscribe((res) =>{
+    this.authService.login(this.loginform.value).subscribe((res) => {
       console.log(res);
       //let user = null; 
-
-      if (res.userId!=null){
-        const user = { 
+      if (res.userId != null) {
+        const user = {
           id: res.userId,
           role: res.userRole
         }
-      StorageService.saveToken(res.jwt);
-      StorageService.setUser(user);
+        StorageService.saveToken(res.jwt);
+        StorageService.setUser(user);
+        if (StorageService.isAdminLoggedIn())
+          this.route.navigateByUrl("/admin/dashboard");
+        else
+        this.route.navigateByUrl("/customer/dashboard");
 
-      }else{
-        this.message.error("Bad credentials" , {nzDuration:5000});
-        
-
+           
+      } else {
+        this.message.error("Bad credentials", { nzDuration: 5000 });
       }
-
     });
-}
-
-
+  }
 }

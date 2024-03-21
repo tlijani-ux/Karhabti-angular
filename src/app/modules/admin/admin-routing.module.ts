@@ -5,9 +5,8 @@ import { PostCarComponent } from './components/post-car/post-car.component';
 
 const routes: Routes = [
 
-  { path: "dashboard", component: AdminDashboardComponent },
-  { path: "car", component: PostCarComponent },
-
+{ path: "dashboard", component: AdminDashboardComponent },
+{ path: "car", component: PostCarComponent },
 
 
 

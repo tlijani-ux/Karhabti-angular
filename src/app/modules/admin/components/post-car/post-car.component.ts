@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-post-car',
@@ -11,16 +14,21 @@ export class PostCarComponent implements OnInit {
   postCarForm!: FormGroup;
   isSpinning = false;
   selectedFile!: File;
-  imagePreview!: string | null;
+  imagePreview: string | null = null;
 
   listOfBrands: string[] = ["Mercedes", "AUDI", "TESLA", "BMW", "TOYOTA", "FORD", "SIAT", "HYUNDAI", "KIA"];
   listOfTypes: string[] = ["Petrol", "Diesel", "Electric"];
   listOfColors: string[] = ["Red", "White", "Blue", "Grey", "Black", "Orange"];
   listOfTransmissions: string[] = ["Manual", "Automatic"];
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private adminService: AdminService,
+    private route: Router,
+    private notification: NzNotificationService
+  ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.postCarForm = this.fb.group({
       name: [null, Validators.required],
       brand: [null, Validators.required],
@@ -33,20 +41,48 @@ export class PostCarComponent implements OnInit {
     });
   }
 
-  postCar() {
+  postCar(): void {
     console.log(this.postCarForm.value);
+    const formData: FormData = new FormData();
+    formData.append('image', this.selectedFile);
+
+    // Add other form data fields
+    formData.append('name', this.postCarForm.get('name')!.value);
+    formData.append('brand', this.postCarForm.get('brand')!.value);
+    formData.append('type', this.postCarForm.get('type')!.value);
+    formData.append('transmission', this.postCarForm.get('transmission')!.value);
+    formData.append('color', this.postCarForm.get('color')!.value);
+    formData.append('price', this.postCarForm.get('price')!.value);
+    formData.append('description', this.postCarForm.get('description')!.value);
+    formData.append('year', this.postCarForm.get('year')!.value);
+
+    this.adminService.postCar(formData).subscribe((res) => {
+      console.log(res);
+      this.notification.success("success", "Car posted successfully");
+      this.route.navigateByUrl("/admin/dashboard");
+    }, (error) => {
+      console.error("Error posting car:", error);
+      let errorMessage = "Failed to post car";
+      if (error.error && typeof error.error === 'string') {
+        errorMessage = error.error;
+      }
+      this.notification.error("Failed", errorMessage);
+    });
+
+
   }
 
-  onFileSelected(event: any) {
+  onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
     this.previewImage();
   }
 
-  previewImage() {
+  previewImage(): void {
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
     };
     reader.readAsDataURL(this.selectedFile);
   }
+
 }

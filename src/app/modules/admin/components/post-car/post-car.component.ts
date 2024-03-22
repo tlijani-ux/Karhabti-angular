@@ -41,42 +41,40 @@ export class PostCarComponent implements OnInit {
     });
   }
 
-  postCar(): void {
-    console.log(this.postCarForm.value);
-    const formData: FormData = new FormData();
-    formData.append('image', this.selectedFile);
-
-    // Add other form data fields
-    formData.append('name', this.postCarForm.get('name')!.value);
-    formData.append('brand', this.postCarForm.get('brand')!.value);
-    formData.append('type', this.postCarForm.get('type')!.value);
-    formData.append('transmission', this.postCarForm.get('transmission')!.value);
-    formData.append('color', this.postCarForm.get('color')!.value);
-    formData.append('price', this.postCarForm.get('price')!.value);
-    formData.append('description', this.postCarForm.get('description')!.value);
-    formData.append('year', this.postCarForm.get('year')!.value);
-
-    this.adminService.postCar(formData).subscribe((res) => {
-      console.log(res);
-      this.notification.success("success", "Car posted successfully");
-      this.route.navigateByUrl("/admin/dashboard");
-    }, (error) => {
-      console.error("Error posting car:", error);
-      let errorMessage = "Failed to post car";
-      if (error.error && typeof error.error === 'string') {
-        errorMessage = error.error;
-      }
-      this.notification.error("Failed", errorMessage);
-    });
-
-
-  }
-
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
     this.previewImage();
   }
 
+  postCar(): void {
+    console.log(this.postCarForm.value);
+
+    const formData: FormData = new FormData();
+    formData.append('image', this.selectedFile);
+    formData.append('name', this.postCarForm.get('name')?.value);
+    formData.append('brand', this.postCarForm.get('brand')?.value);
+    formData.append('type', this.postCarForm.get('type')?.value);
+    formData.append('transmission', this.postCarForm.get('transmission')?.value);
+    formData.append('color', this.postCarForm.get('color')?.value);
+    formData.append('price', this.postCarForm.get('price')?.value);
+    formData.append('description', this.postCarForm.get('description')?.value);
+    formData.append('year', this.postCarForm.get('year')?.value);
+
+
+    this.adminService.postCar(formData).subscribe((res) => {
+      console.log(res);
+      this.notification.success('Success', 'Car posted successfully');
+      this.route.navigateByUrl('/admin/dashboard');
+    },
+      (err) => {
+        console.error('Error posting car:', err);
+        let errorMessage = 'Failed to post car';
+        if (err.error && typeof err.error === 'string') {
+          errorMessage = err.error;
+        }
+        this.notification.error('Failed', errorMessage);
+      });
+  }
   previewImage(): void {
     const reader = new FileReader();
     reader.onload = () => {

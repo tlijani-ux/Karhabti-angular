@@ -22,10 +22,9 @@ export class SignupComponent {
   }
 
   confirmationValidate = (control: FormControl): { [s: string]: boolean } => {
-
     if (!control.value) {
       return { required: true };
-    } else if (control.value! == this.signupForm.controls['passwprd'].value) {
+    } else if (control.value! == this.signupForm.controls['password'].value) {
       return { required: true, error: true };
     }
     return {};
